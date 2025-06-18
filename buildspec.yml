@@ -1,0 +1,30 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8  
+    commands:
+      - curl -o terraform.zip https://releases.hashicorp.com/terraform/1.0.11/terraform_1.0.11_linux_amd64.zip
+      - unzip terraform.zip
+      - mv terraform /usr/local/bin/
+  pre_build:
+    commands:
+      - terraform init
+      - terraform plan
+  build:
+    commands:
+      - terraform apply -auto-approve
+  post_build:
+    commands:
+      - echo "Terraform apply completed."
+      - echo "Sleeping for 300 seconds before destroying resources..."
+      - sleep 600
+      - terraform destroy -auto-approve
+      - echo "Terraform destroy completed."
+
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: yes
+# used to ingore the directory strucrute of the files, puts all the files in the root of the storage S3, used as namespace.
